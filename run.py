@@ -1,23 +1,33 @@
-import json
+import os
 from feedharvest.harvesters import FeedHarvester
+from SciXPipelineUtils import setup_logging, load_config
+
+proj_home = os.path.realpath(os.path.dirname(__file__))
+config = load_config(proj_home=proj_home)
+logger = setup_logging('run.py', proj_home=proj_home,
+                       level=config.get('LOGGING_LEVEL', 'INFO'),
+                       attach_stdout=config.get('LOG_STDOUT', False))
+
+DEFAULT_FEED = "https://joss.theoj.org/papers/published.atom"
 
 def main():
-    #feed = "https://joss.theoj.org/papers/published.atom"
-    feed = "http://www.astronomerstelegram.org/?adsbiblio"
-    foo = FeedHarvester()
-    foo.harvest(url=feed)
-    xml_pages = foo.xml_pages
-    print("I have harvested %s XML pages from the feed %s" % (len(xml_pages), feed))
     
-#    # the xml pages are in FeedHarvester.xml_pages
-#    # parsed records will be in .records
-#    parser = ATOMFeedParser()
-#    records = parser.parse_harvest(foo.xml_pages)
-#    with open("mblahgbl.xml", "w") as fw:
-#        for r in records:
-#            fw.write("%s\n" % r)
-#    print("I found %s records." % len(records))
-        
+    feed = config.get("FEED_URL", DEFAULT_FEED)
+
+    harvester = FeedHarvester(sleep=config.get("SLEEP", False), 
+                              sleep_sec=config.get("SLEEP_SECONDS", 5),
+                              write_xml=config.get("WRITE_XML", False),
+                              xml_out=config.get("OUTPUT_DIR", "./data/")
+    )
+
+    harvester.harvest(url=feed)
+    xml_pages = harvester.xml_pages
+    logger.info("Harvester loaded %s pages of XML from %s" % (len(xml_pages), feed))
+    if config.get("WRITE_XML", False):
+        logger.info("Writing XML to file(s) in %s" % config.get("OUTPUT_DIR", "./data/"))
+        harvester.write()
+    
+    logger.info("Harvesting complete.")
 
 if __name__ == "__main__":
     main()

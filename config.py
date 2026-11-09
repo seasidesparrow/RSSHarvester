@@ -1,0 +1,8 @@
+LOGGING_LEVEL = "INFO"
+LOG_STDOUT = False
+
+WRITE_XML = False
+OUTPUT_DIR = "./xml_data/"
+
+SLEEP = True
+SLEEP_SECONDS = 1
