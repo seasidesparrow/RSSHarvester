@@ -1,0 +1,5 @@
+git+https://github.com/seasidesparrow/SciXPipelineUtils.git@setup_logging
+git+https://github.com/adsabs/SciXIngestParser.git
+lxml
+requests==2.34.2
+rss-parser==4.4.1
